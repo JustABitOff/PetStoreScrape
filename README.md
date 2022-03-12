@@ -1,0 +1,1 @@
+This script scrapes the website of a popular petstore, and stores the data in a MongoDB database. Data is collected daily.
