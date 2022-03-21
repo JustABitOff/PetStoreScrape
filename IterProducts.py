@@ -19,6 +19,25 @@ def GetNumberOfPages(soup, step):
 
     return numPages
 
+def GetProductURLs(numPages, step, baseURL, driver):
+    productURLs = []
+    for page in range(numPages):
+        start = step * page
+        driver.get("{}/?start={}&sz={}".format(baseURL, start, step))
+        soup = BeautifulSoup(driver.page_source, 'lxml')
+        wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'search-result-content')))
+
+        li = soup.find_all('li', {'class': 'grid-tile gtm-grid-tile col-md-4 col-sm-12'})
+
+        for i in li:
+            productPath = i.find('a', {'class': 'name-link'})['href']
+            productURL = "{}{}".format(baseURL, productPath)
+            productURLs.append(productURL)
+        
+        time.sleep(randint(0, 3))
+
+    return productURLs
+
 def GetProductName(soup):
     productNameElem = soup.find('h1', {'class': 'pdp-product-name'})
     if productNameElem:
@@ -199,7 +218,6 @@ def GetProductDocument(url):
 ###############################################################################################
 def main():
     baseURL = "https://www.petsmart.com/dog/food"
-    start = 0
     step = 36
 
     driver = webdriver.Chrome(ChromeDriverManager().install())
@@ -208,21 +226,7 @@ def main():
     soup = BeautifulSoup(driver.page_source, 'lxml')
 
     numPages = GetNumberOfPages(soup, step)
-    productURLs = []
-    for page in range(numPages):
-        start = step * page
-        driver.get("{}/?start={}&sz={}".format(baseURL, start, step))
-        soup = BeautifulSoup(driver.page_source, 'lxml')
-        wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'search-result-content')))
-
-        li = soup.find_all('li', {'class': 'grid-tile gtm-grid-tile col-md-4 col-sm-12'})
-
-        for i in li:
-            productPath = i.find('a', {'class': 'name-link'})['href']
-            productURL = "{}{}".format(baseURL, productPath)
-            productURLs.append(productURL)
-        
-        time.sleep(randint(0, 3))
+    productURLs = GetProductURLs(numPages, step, baseURL, driver)
 
     documents = []
     for url in productURLs:
