@@ -236,9 +236,6 @@ def main():
     numPages = 1
     productURLs = GetProductURLs(numPages, step, baseURL, driver)
 
-    for i in productURLs:
-        print(i)
-
     #Attempt at multiprocessing
     with Pool(processes=4) as pool, tqdm.tqdm(total=len(productURLs)) as progBar:
         documents = []
