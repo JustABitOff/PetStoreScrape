@@ -10,6 +10,8 @@ import time
 from datetime import datetime
 from math import ceil
 import re
+from multiprocessing import Pool
+import tqdm
 
 def GetNumberOfPages(soup, step):
     resultsHitsDiv = soup.find('div', {'class': 'results-hits'}).text
@@ -130,6 +132,7 @@ def GetProductDocument(url):
 
     soup = BeautifulSoup(driver.page_source, 'lxml')
     selectDiv = soup.find('div', {'class': 'variant-select'})
+    documents = []
     if selectDiv:
         selects = selectDiv.findChild('select')['class']
         dropdownType = selects[0]
@@ -180,6 +183,8 @@ def GetProductDocument(url):
                 'Inserted Datetime': datetime.now().isoformat()
             }
 
+            documents.append(productDocument)
+
             time.sleep(randint(0, 3))
 
     else:
@@ -211,9 +216,11 @@ def GetProductDocument(url):
             'Inserted Datetime': datetime.now().isoformat()
         }
 
+        documents.append(productDocument)
+
         time.sleep(randint(0, 3))
 
-    return productDocument
+    return documents
 
 ###############################################################################################
 def main():
@@ -225,13 +232,22 @@ def main():
     wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'results-hits')))
     soup = BeautifulSoup(driver.page_source, 'lxml')
 
-    numPages = GetNumberOfPages(soup, step)
+    #numPages = GetNumberOfPages(soup, step)
+    numPages = 1
     productURLs = GetProductURLs(numPages, step, baseURL, driver)
 
-    documents = []
-    for url in productURLs:
-        documents.append(GetProductDocument(url))
+    for i in productURLs:
+        print(i)
 
+    #Attempt at multiprocessing
+    with Pool(processes=4) as pool, tqdm.tqdm(total=len(productURLs)) as progBar:
+        documents = []
+        for url in pool.imap_unordered(GetProductDocument, productURLs):
+            print(url)
+            documents.extend(url)
+            progBar.update()
+
+    #need to start adding in the MongoDB logic here.
     for i in documents:
         print(i)
 
