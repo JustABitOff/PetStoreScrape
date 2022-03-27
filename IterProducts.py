@@ -12,6 +12,9 @@ from math import ceil
 import re
 from multiprocessing import Pool
 import tqdm
+from dotenv import load_dotenv
+import os
+from pymongo import MongoClient
 
 def GetNumberOfPages(soup, step):
     resultsHitsDiv = soup.find('div', {'class': 'results-hits'}).text
@@ -237,6 +240,21 @@ def GetProductDocument(url):
 
     return documents
 
+def getMongoCollection(uri: str, db: str, collection: str):
+    """
+    Returns a MongoDB collection object for a give Database and Collection.\n
+    Keyword Arguments:\n    
+    uri -- MongoDB URI Connection String \n
+    db -- Name of the MongoDB Database (type) \n
+    collection -- Name of the MongoDB Collection
+    """
+
+    client = MongoClient(uri)
+    dbase = client[db]
+    collObj = dbase[collection]
+
+    return collObj
+
 ###############################################################################################
 def main():
     baseURL = "https://www.petsmart.com/dog/food"
@@ -257,18 +275,28 @@ def main():
             documents.extend(url)
             progBar.update()
 
+###hmm...Maybe move to a function
+    load_dotenv()
+    MONGO_USERNAME = os.getenv("MONGO_USERNAME")
+    MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
+    MONGO_PORT = os.getenv("MONGO_PORT")
+
+    mongoURI = 'mongodb+srv://{}:{}@prodcluster.{}.mongodb.net/'.format(MONGO_USERNAME, MONGO_PASSWORD, MONGO_PORT)
+    db = 'PetStore'
+    collection = 'DogFood'
+
+    DogFoodColl = getMongoCollection(mongoURI, db, collection)
+
     #need to start adding in the MongoDB logic here.
     for i in documents:
         print(i)
-        load_dotenv()
-        MONGO_USERNAME = os.getenv("MONGO_USERNAME")
-        MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
-        MONGO_PORT = os.getenv("MONGO_PORT")
+        DogFoodColl.update_one(
+            
+        )
 
-        homePageURL = 'https://books.toscrape.com/'
-        mongoURI = 'mongodb+srv://{}:{}@prodcluster.{}.mongodb.net/'.format(MONGO_USERNAME, MONGO_PASSWORD, MONGO_PORT)
-        db = 'BookStore'
-        collection = 'Books'
 
 if __name__ == "__main__":
     main()
+
+#TODO:
+##Add documents to MongoDB
