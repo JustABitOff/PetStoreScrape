@@ -127,7 +127,20 @@ def GetOutOfStockStatus(soup):
     return isProductOutOfStock
 
 def GetProductDocument(url):
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+    opts = webdriver.ChromeOptions()
+    opts.add_argument('--headless')
+    prefs = {"profile.managed_default_content_settings.images":2,
+             "profile.default_content_setting_values.notifications":2,
+             "profile.managed_default_content_settings.stylesheets":2,
+             "profile.managed_default_content_settings.cookies":2,
+             "profile.managed_default_content_settings.javascript":1,
+             "profile.managed_default_content_settings.plugins":1,
+             "profile.managed_default_content_settings.popups":2,
+             "profile.managed_default_content_settings.geolocation":2,
+             "profile.managed_default_content_settings.media_stream":2,
+    }
+    opts.add_experimental_option("prefs",prefs)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=opts)
     driver.get(url)
 
     soup = BeautifulSoup(driver.page_source, 'lxml')
@@ -219,6 +232,8 @@ def GetProductDocument(url):
         documents.append(productDocument)
 
         time.sleep(randint(0, 3))
+        
+    driver.close()
 
     return documents
 
@@ -232,15 +247,13 @@ def main():
     wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'results-hits')))
     soup = BeautifulSoup(driver.page_source, 'lxml')
 
-    #numPages = GetNumberOfPages(soup, step)
-    numPages = 1
+    numPages = GetNumberOfPages(soup, step)
     productURLs = GetProductURLs(numPages, step, baseURL, driver)
+    driver.close()
 
-    #Attempt at multiprocessing
     with Pool(processes=4) as pool, tqdm.tqdm(total=len(productURLs)) as progBar:
         documents = []
         for url in pool.imap_unordered(GetProductDocument, productURLs):
-            print(url)
             documents.extend(url)
             progBar.update()
 
