@@ -260,6 +260,15 @@ def main():
     #need to start adding in the MongoDB logic here.
     for i in documents:
         print(i)
+        load_dotenv()
+        MONGO_USERNAME = os.getenv("MONGO_USERNAME")
+        MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
+        MONGO_PORT = os.getenv("MONGO_PORT")
+
+        homePageURL = 'https://books.toscrape.com/'
+        mongoURI = 'mongodb+srv://{}:{}@prodcluster.{}.mongodb.net/'.format(MONGO_USERNAME, MONGO_PASSWORD, MONGO_PORT)
+        db = 'BookStore'
+        collection = 'Books'
 
 if __name__ == "__main__":
     main()
