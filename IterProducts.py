@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 import os
 from pymongo import MongoClient
 
-def GetNumberOfPages(soup, step):
+def GetNumberOfPages(soup: BeautifulSoup, step: int):
     resultsHitsDiv = soup.find('div', {'class': 'results-hits'}).text
     numProducts = re.sub(r'\D+', '', resultsHitsDiv).strip()
     numProducts = int(numProducts) - 1
@@ -24,7 +24,7 @@ def GetNumberOfPages(soup, step):
 
     return numPages
 
-def GetProductURLs(numPages, step, baseURL, driver):
+def GetProductURLs(numPages: int, step: int, baseURL: str, driver):
     productURLs = []
     for page in range(numPages):
         start = step * page
@@ -43,7 +43,7 @@ def GetProductURLs(numPages, step, baseURL, driver):
 
     return productURLs
 
-def GetProductName(soup):
+def GetProductName(soup: BeautifulSoup):
     productNameElem = soup.find('h1', {'class': 'pdp-product-name'})
     if productNameElem:
         for child in productNameElem.find_all():
@@ -54,7 +54,7 @@ def GetProductName(soup):
     
     return productName
 
-def GetProductID(soup):
+def GetProductID(soup: BeautifulSoup):
     productIdElem = soup.find('span', itemprop='productID')
     if productIdElem:
         for child in productIdElem.find_all():
@@ -65,7 +65,7 @@ def GetProductID(soup):
     
     return productID
 
-def GetBrand(soup):
+def GetBrand(soup: BeautifulSoup):
     brandElem = soup.find('a', {'class': 'brand-details'})
     if brandElem:
         for child in brandElem.find_all():
@@ -76,7 +76,7 @@ def GetBrand(soup):
 
     return brand
 
-def GetBasePrice(soup):
+def GetBasePrice(soup: BeautifulSoup):
     basePriceElem = soup.find('span', {'class': 'product-price-standard'})
     if basePriceElem:
         for child in basePriceElem.find_all('span'):
@@ -88,7 +88,7 @@ def GetBasePrice(soup):
 
     return basePrice
 
-def GetDiscountedPrice(soup):
+def GetDiscountedPrice(soup: BeautifulSoup):
     discountedPriceElem = soup.find('span', {'class': 'product-price-sales'})
     if discountedPriceElem:
         for child in discountedPriceElem.find_all():
@@ -100,7 +100,7 @@ def GetDiscountedPrice(soup):
 
     return discountedPrice
 
-def GetSize(soup):
+def GetSize(soup: BeautifulSoup):
     sizeElem = soup.find('div', {'id': 'size'})
     if sizeElem:
         for child in sizeElem.find_all('strong'):
@@ -110,7 +110,7 @@ def GetSize(soup):
     
     return size
 
-def GetFlavor(soup):
+def GetFlavor(soup: BeautifulSoup):
     flavorElem = soup.find('div', {'id': 'customFlavor'})
     if flavorElem:
         for child in flavorElem.find_all('strong'):
@@ -120,7 +120,7 @@ def GetFlavor(soup):
     
     return flavor
 
-def GetOutOfStockStatus(soup):
+def GetOutOfStockStatus(soup: BeautifulSoup):
     stockStatusElem = soup.find('div', {'class': 'pdp-sth-outofstock'})
     if stockStatusElem:
         isProductOutOfStock = True
@@ -129,7 +129,7 @@ def GetOutOfStockStatus(soup):
 
     return isProductOutOfStock
 
-def GetProductDocument(url):
+def GetProductDocument(url: str):
     opts = webdriver.ChromeOptions()
     opts.add_argument('--headless')
     prefs = {"profile.managed_default_content_settings.images":2,
@@ -145,6 +145,7 @@ def GetProductDocument(url):
     opts.add_experimental_option("prefs",prefs)
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=opts)
     driver.get(url)
+    wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'search-result-content')))
 
     soup = BeautifulSoup(driver.page_source, 'lxml')
     selectDiv = soup.find('div', {'class': 'variant-select'})
@@ -182,21 +183,21 @@ def GetProductDocument(url):
             isProductOutOfStock = GetOutOfStockStatus(soup)
 
             productDocument = {
-                'Product ID': productID,
+                'ProductID': productID,
                 'Brand': brand,
-                'Product Name': productName,
-                'Base Price': {
+                'ProductName': productName,
+                'BasePrice': {
                     'Amount': basePrice,
                     'Currency': 'USD'
                 },
-                'Discounted Price': {
+                'DiscountedPrice': {
                     'Amount': discountedPrice,
                     'Currency': 'USD'
                 },
                 'Size': size,
                 'Flavor': flavor,
-                'Is Product Out of Stock': isProductOutOfStock,
-                'Inserted Datetime': datetime.now().isoformat()
+                'IsProductOutOfStock': isProductOutOfStock,
+                'CreatedDatetime': datetime.now().isoformat()
             }
 
             documents.append(productDocument)
@@ -215,21 +216,21 @@ def GetProductDocument(url):
         isProductOutOfStock = GetOutOfStockStatus(soup)
 
         productDocument = {
-            'Product ID': productID,
+            'ProductID': productID,
             'Brand': brand,
-            'Product Name': productName,
-            'Base Price': {
+            'ProductName': productName,
+            'BasePrice': {
                 'Amount': basePrice,
                 'Currency': 'USD'
             },
-            'Discounted Price': {
+            'DiscountedPrice': {
                 'Amount': discountedPrice,
                 'Currency': 'USD'
             },
             'Size': size,
             'Flavor': flavor,
-            'Is Product Out of Stock': isProductOutOfStock,
-            'Inserted Datetime': datetime.now().isoformat()
+            'IsProductOutOfStock': isProductOutOfStock,
+            'CreatedDatetime': datetime.now().isoformat()
         }
 
         documents.append(productDocument)
@@ -275,7 +276,7 @@ def main():
             documents.extend(url)
             progBar.update()
 
-###hmm...Maybe move to a function
+    ###hmm...Maybe move to a function
     load_dotenv()
     MONGO_USERNAME = os.getenv("MONGO_USERNAME")
     MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
@@ -288,15 +289,19 @@ def main():
     DogFoodColl = getMongoCollection(mongoURI, db, collection)
 
     #need to start adding in the MongoDB logic here.
-    for i in documents:
-        print(i)
-        DogFoodColl.update_one(
-            
-        )
+    DogFoodColl.insert_many(
+        documents
+    )
 
 
 if __name__ == "__main__":
     main()
 
 #TODO:
-##Add documents to MongoDB
+##Add documents to MongoDB if they don't exist
+##If they do exist, update them with the following logic
+    ##Move the existing Base Price to a list within the main document. 
+    ##Also move the AsOfDatetime witht he Base Price
+    ##Finally, upsert the NEW Base Price into the document, update the discounted price, update all other potentially changing fields
+    ##Or should I just insert a new document? Hmmmm.
+        ##Maybe this because there is a ProductID. I could use this to track all things related to each product. 1 product -> Many documents
