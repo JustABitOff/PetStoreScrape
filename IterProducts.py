@@ -39,7 +39,6 @@ def GetProductURLs(numPages: int, step: int, baseURL: str, driver):
             productPath = i.find('a', {'class': 'name-link'})['href']
             productURL = "{}{}".format(baseURL, productPath)
             productURLs.append(productURL)
-            print(productURL) #DELETE ME LATER
         
         time.sleep(randint(0, 3))
 
@@ -285,8 +284,6 @@ def main():
     soup = BeautifulSoup(driver.page_source, 'lxml')
 
     numPages = GetNumberOfPages(soup, step)
-    print(numPages) #DELETE ME LATER
-    numPages = 1 #DELETE ME LATER
     productURLs = GetProductURLs(numPages, step, baseURL, driver)
     driver.close()
 
@@ -294,6 +291,8 @@ def main():
         documents = []
         for url in pool.imap_unordered(GetProductDocument, productURLs):
             documents.extend(url)
+            clear = lambda: os.system('clear')
+            clear()
             progBar.update()
 
     ###hmm...Maybe move to a function
