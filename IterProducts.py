@@ -83,7 +83,10 @@ def GetBasePrice(soup: BeautifulSoup):
         for child in basePriceElem.find_all('span'):
             child.decompose()
         basePrice = basePriceElem.text.strip()
-        basePrice = float(basePrice[1::])
+        try:
+            basePrice = float(basePrice[1::])
+        except:
+            basePrice = None
     else:
         basePrice = None
 
@@ -95,7 +98,10 @@ def GetDiscountedPrice(soup: BeautifulSoup):
         for child in discountedPriceElem.find_all():
             child.decompose()
         discountedPrice = discountedPriceElem.text.strip()
-        discountedPrice = float(discountedPrice[1::])
+        try:
+            discountedPrice = float(discountedPrice[1::])
+        except:
+            discountedPrice = None
     else:
         discountedPrice = None
 
