@@ -149,7 +149,7 @@ def GetProductDocument(url: str):
     driver = webdriver.Chrome(service=serv, options=opts)
     driver.get(url)
     driver.maximize_window()
-    wait(driver, 25).until(EC.presence_of_element_located((By.CLASS_NAME, 'search-result-content')))
+    wait(driver, 25).until(EC.presence_of_element_located((By.CLASS_NAME, 'row product-info-row')))
 
     soup = BeautifulSoup(driver.page_source, 'lxml')
     selectDiv = soup.find('div', {'class': 'variant-select'})
