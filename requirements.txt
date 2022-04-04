@@ -1,6 +1,5 @@
 bs4
 selenium
-multiprocessing
 tqdm
 python-dotenv
 pymongo
