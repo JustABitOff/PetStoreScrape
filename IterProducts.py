@@ -262,8 +262,21 @@ def main():
     baseURL = "https://www.petsmart.com/dog/food"
     step = 36
 
+    opts = webdriver.ChromeOptions()
+    opts.add_argument('--headless')
+    prefs = {"profile.managed_default_content_settings.images":2,
+             "profile.default_content_setting_values.notifications":2,
+             "profile.managed_default_content_settings.stylesheets":2,
+             "profile.managed_default_content_settings.cookies":2,
+             "profile.managed_default_content_settings.javascript":1,
+             "profile.managed_default_content_settings.plugins":1,
+             "profile.managed_default_content_settings.popups":2,
+             "profile.managed_default_content_settings.geolocation":2,
+             "profile.managed_default_content_settings.media_stream":2,
+    }
+    opts.add_experimental_option("prefs",prefs)
     serv = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=serv)
+    driver = webdriver.Chrome(service=serv, options=opts)
     driver.get(baseURL)
     wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'results-hits')))
     soup = BeautifulSoup(driver.page_source, 'lxml')
