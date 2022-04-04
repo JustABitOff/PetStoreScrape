@@ -145,7 +145,8 @@ def GetProductDocument(url: str):
              "profile.managed_default_content_settings.media_stream":2,
     }
     opts.add_experimental_option("prefs",prefs)
-    driver = webdriver.Chrome(ChromeDriverManager().install(), options=opts)
+    serv = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=serv, options=opts)
     driver.get(url)
     wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'search-result-content')))
 
@@ -284,6 +285,7 @@ def main():
 
     numPages = GetNumberOfPages(soup, step)
     print(numPages) #DELETE ME LATER
+    numPages = 1 #DELETE ME LATER
     productURLs = GetProductURLs(numPages, step, baseURL, driver)
     driver.close()
 
