@@ -1,0 +1,12 @@
+random
+bs4
+selenium
+time
+datetime
+math
+re
+multiprocessing
+tqdm
+python-dotenv
+os
+pymongo
