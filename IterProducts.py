@@ -1,3 +1,4 @@
+from ast import excepthandler
 from random import randint
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -154,7 +155,15 @@ def GetProductDocument(url: str):
     opts.add_experimental_option("prefs",prefs)
     serv = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=serv, options=opts)
-    driver.get(url)
+
+    try:
+        driver.get(url)
+    except:
+        try:
+            driver.navigate().refresh()
+        except:
+            return None
+            
     driver.maximize_window()
 
     soup = BeautifulSoup(driver.page_source, 'lxml')
