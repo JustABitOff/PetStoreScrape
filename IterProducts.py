@@ -2,6 +2,7 @@ from random import randint
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait as wait
@@ -261,7 +262,8 @@ def main():
     baseURL = "https://www.petsmart.com/dog/food"
     step = 36
 
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+    serv = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=serv)
     driver.get(baseURL)
     wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'results-hits')))
     soup = BeautifulSoup(driver.page_source, 'lxml')
