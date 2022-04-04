@@ -3,3 +3,4 @@ selenium
 tqdm
 python-dotenv
 pymongo
+webdriver-manager
