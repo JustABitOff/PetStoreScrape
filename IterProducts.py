@@ -31,7 +31,7 @@ def GetProductURLs(numPages: int, step: int, baseURL: str, driver):
         start = step * page
         driver.get("{}/?start={}&sz={}".format(baseURL, start, step))
         soup = BeautifulSoup(driver.page_source, 'lxml')
-        wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'search-result-content')))
+        wait(driver, 25).until(EC.presence_of_element_located((By.CLASS_NAME, 'search-result-content')))
 
         li = soup.find_all('li', {'class': 'grid-tile gtm-grid-tile col-md-4 col-sm-12'})
 
@@ -149,7 +149,7 @@ def GetProductDocument(url: str):
     driver = webdriver.Chrome(service=serv, options=opts)
     driver.get(url)
     driver.maximize_window()
-    wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'search-result-content')))
+    wait(driver, 25).until(EC.presence_of_element_located((By.CLASS_NAME, 'search-result-content')))
 
     soup = BeautifulSoup(driver.page_source, 'lxml')
     selectDiv = soup.find('div', {'class': 'variant-select'})
@@ -158,7 +158,7 @@ def GetProductDocument(url: str):
         selects = selectDiv.findChild('select')['class']
         dropdownType = selects[0]
 
-        drop = Select(wait(driver, 15).until(EC.presence_of_element_located((By.ID, dropdownType))))
+        drop = Select(wait(driver, 25).until(EC.presence_of_element_located((By.ID, dropdownType))))
         options = drop.options
 
         for option in options:
@@ -282,7 +282,7 @@ def main():
     driver = webdriver.Chrome(service=serv, options=opts)
     driver.get(baseURL)
     driver.maximize_window()
-    wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'results-hits')))
+    wait(driver, 25).until(EC.presence_of_element_located((By.CLASS_NAME, 'results-hits')))
     soup = BeautifulSoup(driver.page_source, 'lxml')
 
     numPages = GetNumberOfPages(soup, step)
