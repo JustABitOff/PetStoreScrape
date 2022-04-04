@@ -148,6 +148,7 @@ def GetProductDocument(url: str):
     serv = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=serv, options=opts)
     driver.get(url)
+    driver.maximize_window()
     wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'search-result-content')))
 
     soup = BeautifulSoup(driver.page_source, 'lxml')
@@ -280,6 +281,7 @@ def main():
     serv = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=serv, options=opts)
     driver.get(baseURL)
+    driver.maximize_window()
     wait(driver, 15).until(EC.presence_of_element_located((By.CLASS_NAME, 'results-hits')))
     soup = BeautifulSoup(driver.page_source, 'lxml')
 
