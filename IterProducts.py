@@ -42,6 +42,8 @@ def GetProductURLs(numPages: int, step: int, baseURL: str, driver):
         
         time.sleep(randint(0, 3))
 
+        print(productURL)
+
     return productURLs
 
 def GetProductName(soup: BeautifulSoup):
