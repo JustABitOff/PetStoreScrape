@@ -163,7 +163,7 @@ def GetProductDocument(url: str):
             driver.navigate().refresh()
         except:
             return None
-            
+
     driver.maximize_window()
 
     soup = BeautifulSoup(driver.page_source, 'lxml')
@@ -307,7 +307,8 @@ def main():
     with Pool(processes=4) as pool, tqdm.tqdm(total=len(productURLs)) as progBar:
         documents = []
         for url in pool.imap_unordered(GetProductDocument, productURLs):
-            documents.extend(url)
+            if url:
+                documents.extend(url)
             clear = lambda: os.system('clear')
             clear()
             progBar.update()
