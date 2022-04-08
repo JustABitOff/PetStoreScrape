@@ -333,12 +333,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-#TODO:
-##Add documents to MongoDB if they don't exist
-##If they do exist, update them with the following logic
-    ##Move the existing Base Price to a list within the main document. 
-    ##Also move the AsOfDatetime witht he Base Price
-    ##Finally, upsert the NEW Base Price into the document, update the discounted price, update all other potentially changing fields
-    ##Or should I just insert a new document? Hmmmm.
-        ##Maybe this because there is a ProductID. I could use this to track all things related to each product. 1 product -> Many documents
